@@ -5,10 +5,12 @@ from discord.utils import get
 from youtube_dl import YoutubeDL
 import random
 from dotenv import load_dotenv
+import aiohttp
 
 load_dotenv()
 
 TOKEN = os.getenv("SECRET_TOKEN")
+GPT_KEY = os.getenv("OPEN_AI")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -58,7 +60,26 @@ async def ban(ctx, member: discord.Member, *, reason=None):
     await channel.send("Has sido baneado. Espero que no vuelvas a repetir esas cosas")
     await member.ban(reason=reason)
     await ctx.send(f'Usuario {member} ha sido baneado')
-    
+
+@client.command()
+async def askgpt(ctx: commands.Context, *, prompt: str):
+    async with aiohttp.ClientSession() as session:
+        payload = {
+            "model": "text-davinci-003",
+            "prompt": prompt,
+            "temperature": 0.5,
+            "max_tokens": 50,
+            "presence_penalty": 0,
+            "frequency_panelty": 0,
+            "best_of": 1,
+        }
+
+        headers = {"Authorization": f"Bearer {GPT_KEY}"}
+        async with session.post("https://api.openai.com/v1/completions", json=payload, headers=headers) as resp:
+            response = await resp.json()
+            embed = discord.Embed(title="Respuesta de chatGPT: ", description=response["choices"][0]["text"])  
+            await ctx.reply(embed=embed)
+
 @client.command()
 async def capihelp(ctx):
     embed=discord.Embed(title="Comandos", description="Los comandos del bot", color=discord.Color.blue())
@@ -69,6 +90,7 @@ async def capihelp(ctx):
     embed.add_field(name="Miscleaneos", value="Comandos de diversion", inline=False)
     embed.add_field(name="!play <url>", value="Se une al canal de voz y reproduce el audio", inline=True)
     embed.add_field(name="!rolldice", value="Tira un dado", inline=True)
+    embed.add_field(name="!askgpt <pregunta>", value="Preguntas a chatgpt (La pregunta debe estar entre comillas y en ingles)", inline=True)
     embed.set_author(name="Capi Bot")
     embed.set_footer(text="Comando pedido por: {}".format(ctx.author.display_name))
     await ctx.send(embed=embed)
