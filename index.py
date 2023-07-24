@@ -1,4 +1,6 @@
 import discord
+import requests
+import json
 import os
 from discord.ext import commands
 from discord.utils import get
@@ -14,6 +16,9 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 client = commands.Bot(command_prefix='!' , intents=intents)
+
+
+
 
 @client.command()
 async def play(ctx, url):
@@ -73,5 +78,29 @@ async def capihelp(ctx):
     embed.set_footer(text="Comando pedido por: {}".format(ctx.author.display_name))
     await ctx.send(embed=embed)
 
+@client.command()
+async def check_server(ctx, address):
+    data = getdata(address)
+    fResponse = json.dumps(data, indent=8)
+    await ctx.send(f'```json\n{fResponse}\n```')
+
+#### MCSERVER FUNCTION
+def getdata(address):
+    response = requests.get(f'https://api.mcstatus.io/v2/status/java/{address}')
+    responseJson = response.json()
+
+    if 'icon' in responseJson:
+        del responseJson['icon']
+
+    if 'motd' in responseJson:
+        del responseJson['motd']
+
+    if 'name_html' in 'version' in responseJson:
+        del responseJson['version']['name_html']
+
+    if 'list' in 'players' in responseJson:
+        del responseJson['players']['list']
+        
+    return responseJson
 
 client.run(TOKEN)
