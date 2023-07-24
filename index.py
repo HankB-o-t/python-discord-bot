@@ -74,6 +74,7 @@ async def capihelp(ctx):
     embed.add_field(name="Miscleaneos", value="Comandos de diversion", inline=False)
     embed.add_field(name="!play <url>", value="Se une al canal de voz y reproduce el audio", inline=True)
     embed.add_field(name="!rolldice", value="Tira un dado", inline=True)
+    embed.add_field(name="!checksv <Servidor>", value="Observa los datos de un servidor de mc", inline=True)
     embed.set_author(name="Capi Bot")
     embed.set_footer(text="Comando pedido por: {}".format(ctx.author.display_name))
     await ctx.send(embed=embed)
