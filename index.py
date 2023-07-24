@@ -80,7 +80,7 @@ async def capihelp(ctx):
     await ctx.send(embed=embed)
 
 @client.command()
-async def check_server(ctx, address):
+async def checksv(ctx, address):
     data = getdata(address)
     fResponse = json.dumps(data, indent=8)
     await ctx.send(f'```json\n{fResponse}\n```')
