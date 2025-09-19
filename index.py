@@ -7,6 +7,7 @@ from discord.utils import get
 from youtube_dl import YoutubeDL
 import random
 from dotenv import load_dotenv
+import getdata
 
 load_dotenv()
 
@@ -16,9 +17,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 client = commands.Bot(command_prefix='!' , intents=intents)
-
-
-
 
 @client.command()
 async def play(ctx, url):
@@ -75,6 +73,7 @@ async def capihelp(ctx):
     embed.add_field(name="!play <url>", value="Se une al canal de voz y reproduce el audio", inline=True)
     embed.add_field(name="!rolldice", value="Tira un dado", inline=True)
     embed.add_field(name="!checksv <Servidor>", value="Observa los datos de un servidor de mc", inline=True)
+    embed.add_field(name="!dolar/blue/euro", value="Valores de distintas monedas con respecto al Peso Argentino", inline=True)
     embed.set_author(name="Capi Bot")
     embed.set_footer(text="Comando pedido por: {}".format(ctx.author.display_name))
     await ctx.send(embed=embed)
@@ -85,23 +84,22 @@ async def checksv(ctx, address):
     fResponse = json.dumps(data, indent=8)
     await ctx.send(f'```json\n{fResponse}\n```')
 
-#### MCSERVER FUNCTION
-def getdata(address):
-    response = requests.get(f'https://api.mcstatus.io/v2/status/java/{address}')
-    responseJson = response.json()
+@client.command()
+async def dolar(ctx):
+    data = getdata.getdolar()
+    fResponse = json.dumps(data, indent=8)
+    await ctx.send(f'```json\n{fResponse}\n```')
 
-    if 'icon' in responseJson:
-        del responseJson['icon']
+@client.command()
+async def blue(ctx):
+    data = getdata.getblue()
+    fResponse = json.dumps(data, indent=8)
+    await ctx.send(f'```json\n{fResponse}\n```')
 
-    if 'motd' in responseJson:
-        del responseJson['motd']
-
-    if 'name_html' in 'version' in responseJson:
-        del responseJson['version']['name_html']
-
-    if 'list' in 'players' in responseJson:
-        del responseJson['players']['list']
-        
-    return responseJson
+@client.command()
+async def euro(ctx):
+    data = getdata.geteuro()
+    fResponse = json.dumps(data, indent=8)
+    await ctx.send(f'```json\n{fResponse}\n```')
 
 client.run(TOKEN)
